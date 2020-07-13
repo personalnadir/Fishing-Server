@@ -6,6 +6,7 @@ const { insert, fetchParticipantsStream, fetchDataStream} = require('./documentm
 const TrialAttemptModel = require ('./schemas/trial');
 const KeyChoiceModel = require ('./schemas/keychoice');
 const VASModel = require ('./schemas/vas');
+const GalleryModel = require ('./schemas/gallery');
 
 const { pipeline } = require('stream');
 const { Transform } = require('json2csv');
@@ -29,9 +30,13 @@ app.post('/keys', function (req, res, next) {
   	res.json(req.body);
 });
 
-
 app.post('/vas', function (req, res, next) {
 	insert(VASModel, req.body);
+  	res.json(req.body);
+});
+
+app.post('/gallery', function (req, res, next) {
+	insert(GalleryModel, req.body);
   	res.json(req.body);
 });
 
