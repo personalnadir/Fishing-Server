@@ -11,6 +11,7 @@ const GalleryModel = require ('./schemas/gallery');
 const { pipeline } = require('stream');
 const { Transform } = require('json2csv');
 const conf=require("./config.js");
+const _=require ("underscore");
 
 const basic = auth.basic({
 		realm: "Download"
@@ -69,27 +70,66 @@ app.get('/participants', function (req, res, next) {
 	});
 });
 
+const json2csvFactory = {
+	trials: ()=> {
+		const opts = {
+			fields: ["participant", "date", "millis", "stimulusCategory", "phase", "trial", "trialTime", "rule", "image", "filePath", "block", "blockStartTime", "stimulusTime", "correctKey", "pressedKey", "reactionTime", "correct", "rewardChange", "rewardTotal"]
+		};
+		return new Transform(opts);
+	},
+	keys: ()=> {
+		const opts = {
+			fields: ["participant", "date", "millis", "questionnaire", "image", "correctKey", "userSelectedKey"]
+		};
+		return new Transform(opts);
+	},
+	vas: ()=> {
+		const opts = {
+			fields: ["participant", "date", "millis", "questionnaire", "value"]
+		};
+		return new Transform(opts);
+	},
+	gallery: ()=> {
+		const opts = {
+			fields: ["participant", "date", "millis", "correctImages", "imagesSelected"]
+		};
+		return new Transform(opts);
+	}
+}
 
-app.get('/data/:id', basic.check((req, res) => {
-	const {id: participant} = req.params;
+const dataModels = {
+	trials: TrialAttemptModel,
+	keys: KeyChoiceModel,
+	vas: VASModel,
+	gallery: GalleryModel
+};
 
-	const opts = {
-		fields: ["participant", "date", "millis", "stimulusCategory", "phase", "trial", "trialTime", "rule", "image", "filePath", "block", "blockStartTime", "stimulusTime", "correctKey", "pressedKey", "reactionTime", "correct"]
-	};
-	const json2csv = new Transform(opts);
-	const stream = fetchDataStream(participant);
+const dkeys = dataModels.keys();
+const jkeys = json2csvFactory.keys();
+const diff = _.difference(dkeys,jkeys);
+console.assert(diff && diff.length > 0, `Missing keys! ${diff}`);
+
+app.get('/data/:id/set/:set', basic.check((req, res) => {
+	const {id: participant, set} = req.params;
+
+	if (set in json2csvFactory === false){
+		res.writeHead(204,{"Content-Type": "text/plain"});
+		res.end();
+		return;
+	}
+
+	const stream = fetchDataStream(dataModels[set], participant);
 
 	if (!stream) {
 		res.writeHead(204,{"Content-Type": "text/plain"});
 		res.end();
 		return;
 	}
-
 	res.setHeader("Content-disposition", `attachment; filename=${participant}.csv`);
 	res.setHeader("Content-type", "text/csv");
 	res.setHeader("Set-Cookie", "fileDownload=true; path=/");
-
-	pipeline(stream, json2csv, res,(err) => {
+	const transform = json2csvFactory[set]();
+	pipeline(stream, transform, res,(err) => {
 		if (err) {
 		 	console.error('download failed.', err);
 	    } else {
