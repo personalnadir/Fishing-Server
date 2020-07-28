@@ -27,7 +27,7 @@
 			validator: function(v) {
 				return v.length == 6;
 			},
-			message: props => `${props.path} must have length 6, got '${props.value.length}'`;
+			message: props => `${props.path} must have length 6, got '${props.value.length}'`
 		},
 	},
 	imagesSelected: {
@@ -37,7 +37,7 @@
 			validator: function(v) {
 				return v.length == 6;
 			},
-			message: props => `${props.path} must have length 6, got '${props.value.length}'`;
+			message: props => `${props.path} must have length 6, got '${props.value.length}'`
 		},
 	}
 });
