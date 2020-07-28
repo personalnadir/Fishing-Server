@@ -84,6 +84,12 @@
 	correct: {
 		type: Boolean,
 		required: true
+	},
+	rewardChange: {
+		type: Number
+	},
+	rewardTotal: {
+		 type: Number
 	}
   });
 
