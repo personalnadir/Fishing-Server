@@ -14,7 +14,11 @@
 	questionnaire: {
 		type: String,
 		require: true
-	}
+	},
+	image: {
+		type: String,
+		require: true
+	},
 	millis: {
 		type: Number,
 		required: true,
