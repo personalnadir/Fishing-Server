@@ -60,7 +60,7 @@ app.get('/login/:id', function (req, res, next) {
 
 app.get('/participants', function (req, res, next) {
 
-	pipeline(fetchParticipantsStream(), res,(err) => {
+	pipeline(fetchParticipantsStream(TrialAttemptModel), res,(err) => {
 		if (err) {
 			console.error('Pipeline failed.', err);
 			next(err);
