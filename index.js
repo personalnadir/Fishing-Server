@@ -91,7 +91,7 @@ const json2csvFactory = {
 	},
 	gallery: ()=> {
 		const opts = {
-			fields: ["participant", "date", "millis", "correctImages", "imagesSelected"]
+			fields: ["participant", "date", "millis", "questionnaire", "correctImages", "imagesSelected"]
 		};
 		return new Transform(opts);
 	}
